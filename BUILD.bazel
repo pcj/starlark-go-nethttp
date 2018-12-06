@@ -1,0 +1,52 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+gazelle(
+    name = "gazelle",
+    args = [
+        "-build_file_name",
+        "BUILD.bazel",
+    ],
+    command = "fix",
+    prefix = "github.com/pcj/starlark-go-nethttp",
+)
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "delete.go",
+        "do.go",
+        "get.go",
+        "module.go",
+        "patch.go",
+        "post.go",
+        "put.go",
+        "request.go",
+        "response.go",
+    ],
+    importpath = "github.com/pcj/starlark-go-nethttp",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@net_starlark_go//starlark:go_default_library",
+        "@net_starlark_go//starlarkstruct:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    size = "small",
+    srcs = [
+        "delete_test.go",
+        "do_test.go",
+        "get_test.go",
+        "module_test.go",
+        "patch_test.go",
+        "post_test.go",
+        "put_test.go",
+        "request_test.go",
+        "response_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":go_default_library"],
+    deps = ["@net_starlark_go//starlark:go_default_library"],
+)
