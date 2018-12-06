@@ -1,54 +1,44 @@
 # starlark-go-nethttp
 
-A wrapper around a minimal subset of `net/http` package for use within [starlark](https://github.com/google/starlark-go).
+A wrapper around a minimal subset of `net/http` package for use within
+[starlark-go](https://github.com/google/starlark-go).
 
-## Installation
+## Documentation
 
-Include the module and add it to your global scope:
+* API documentation: [godoc.org/github.com/pcj/starlark-go-nethttp](https://godoc.org/github.com/pcj/starlark-go-nethttp)
 
-```go
-package main 
+### Getting started
 
-import (
-    "flag"
-    "fmt"
-    "os"
+Build the code:
 
-    "github.com/pcj/starlark-go-nethttp"
+```shell
+# check out the code and dependencies,
+# and install interpreter in $GOPATH/bin
+$ go get -u github.com/pcj/starlark-go-nethttp
+```
 
-    "go.starlark.net/repl"
-    "go.starlark.net/starlark"
-)
+Run the interpreter or interact with the read-eval-print loop (REPL):
 
-func main() {
-    thread := &starlark.Thread{
-        Print: func(_ *starlark.Thread, msg string) { fmt.Println(msg) },
-    }
-    globals := &starlark.StringDict{
-        "http": nethttp.NewModule(),
-    }
-    filename := flag.Args()[0]
-    var err error
-    globals, err = starlark.ExecFile(thread, filename, nil, globals)
-    if err != nil {
-        repl.PrintError(err)
-        os.Exit(1)
-    }
+```
+$ nethttp
+>>> resp = http.get("https://google.com")
+>>> resp.code
+200
+>>>
+```
+
+When you have finished, type `Ctrl-D` to close the REPL's input stream. 
+
+### Embedding
+
+To embed the module within your own configuration language, add it to your globals:
+
+```python
+globals := starlark.StringDict{
+    "http": nethttp.NewModule(),
 }
 ```
 
-## Usage 
+### Contributing
 
-Then, within your starlark script:
-
-```python
-response = http.get("https//example.com")
-
-print("{status} ({code}): error={error}\n\n{body}".format(
-    status = response.status,
-    code = response.code,
-    error = response.error,
-    body = response.body,
-))
-
-```
+Contributions welcome.
