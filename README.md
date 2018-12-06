@@ -24,7 +24,7 @@ func main() {
     thread := &starlark.Thread{
         Print: func(_ *starlark.Thread, msg string) { fmt.Println(msg) },
     }
-	globals := &starlark.StringDict{
+    globals := &starlark.StringDict{
         "http": nethttp.NewModule(),
     }
     filename := flag.Args()[0]
@@ -43,9 +43,12 @@ Then, within your starlark script:
 
 ```python
 response = http.get("https//example.com")
+
 print("{status} ({code}): error={error}\n\n{body}".format(
     status = response.status,
     code = response.code,
     error = response.error,
+    body = response.body,
 ))
+
 ```
