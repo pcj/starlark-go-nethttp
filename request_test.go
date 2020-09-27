@@ -22,6 +22,16 @@ func TestRequest(t *testing.T) {
 			output: `http://example.com`,
 		},
 		{
+			name:   "Request params is captured",
+			input:  `print(http.Request(url="http://example.com",params={"k":"v"}).url)`,
+			output: `http://example.com?k=v`,
+		},
+		{
+			name:   "Request headers is captured",
+			input:  `print(http.Request(url="",headers={"k":"v"}).headers)`,
+			output: `{"k": ["v"]}`,
+		},
+		{
 			name:   "Request body is captured",
 			input:  `print(http.Request(url="", body="foo").body)`,
 			output: `foo`,
