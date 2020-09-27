@@ -43,7 +43,7 @@ print(http.get("https://httpbin.org/get").error)
 			input: `
 print(http.get("https://httpbin.org/idontexist").status)
 `,
-			output: `404 NOT FOUND`, // depends on server for response message
+			output: `404 Not Found`, // depends on server for response message
 		},
 
 		{
@@ -51,7 +51,7 @@ print(http.get("https://httpbin.org/idontexist").status)
 			input: `
 print(http.get("ssh://httpbin.org/idontexist").error)
 `,
-			output: `Get ssh://httpbin.org/idontexist: unsupported protocol scheme "ssh"`,
+			output: `Get "ssh://httpbin.org/idontexist": unsupported protocol scheme "ssh"`,
 		},
 	}
 

@@ -32,7 +32,11 @@ type testCase struct {
 }
 
 func runTestCase(t *testing.T, i int, tc *testCase) {
+	t.Helper()
+
 	t.Run(tc.name, func(t *testing.T) {
+		t.Helper()
+
 		var out bytes.Buffer
 		thread := &starlark.Thread{
 			Print: func(_ *starlark.Thread, msg string) { fmt.Fprintln(&out, msg) },
