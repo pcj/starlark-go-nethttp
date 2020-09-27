@@ -86,6 +86,7 @@ func newRequestFromStarlarkArgs(method string, args starlark.Tuple, kwargs []sta
 
 	var rawurl, body string
 	headers := &starlark.Dict{}
+	params := &starlark.Dict{}
 
 	if err := starlark.UnpackArgs("http.Request", args, kwargs,
 		"url", &rawurl,
@@ -93,6 +94,7 @@ func newRequestFromStarlarkArgs(method string, args starlark.Tuple, kwargs []sta
 		"host?", &request.Host,
 		"body?", &body,
 		"headers?", &headers,
+		"params?", &params,
 	); err != nil {
 		return nil, err
 	}
@@ -102,7 +104,18 @@ func newRequestFromStarlarkArgs(method string, args starlark.Tuple, kwargs []sta
 		return nil, err
 	}
 
-	header, err := getHeadersFromDict(headers)
+	param, err := getMapFromDict(params)
+	if err != nil {
+		return nil, err
+	}
+
+	q := parsedURL.Query()
+	for k, v := range param {
+		q[k] = append(q[k], v...)
+	}
+	parsedURL.RawQuery = q.Encode()
+
+	header, err := getMapFromDict(headers)
 	if err != nil {
 		return nil, err
 	}
@@ -115,10 +128,10 @@ func newRequestFromStarlarkArgs(method string, args starlark.Tuple, kwargs []sta
 	return request, nil
 }
 
-func getHeadersFromDict(dict *starlark.Dict) (http.Header, error) {
-	headers := http.Header(make(map[string][]string))
+func getMapFromDict(dict *starlark.Dict) (map[string][]string, error) {
+	m := make(map[string][]string, dict.Len())
 	for _, item := range dict.Items() {
-		k, ok := item[0].(*starlark.String)
+		k, ok := item[0].(starlark.String)
 		if !ok {
 			return nil, fmt.Errorf("Expected string key type for: %+v", item)
 		}
@@ -126,18 +139,12 @@ func getHeadersFromDict(dict *starlark.Dict) (http.Header, error) {
 
 		switch t := item[1].(type) {
 		case starlark.String:
-			headers[key] = append(headers[key], t.GoString())
+			m[key] = append(m[key], t.GoString())
 		case *starlark.List:
-			headers[key] = getStringSliceFromStarlarkList(t)
+			m[key] = getStringSliceFromStarlarkList(t)
 		}
-		v, ok := item[1].(starlark.String)
-		if !ok {
-			return nil, fmt.Errorf("Expected string value type for: %+v", item)
-		}
-		value := v.GoString()
-		headers[key] = append(headers[key], value)
 	}
-	return headers, nil
+	return m, nil
 }
 
 func getStringSliceFromStarlarkList(list *starlark.List) []string {
